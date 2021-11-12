@@ -179,6 +179,8 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
     private final static int menu_speed_fast = 3;
     private final static int menu_speed_veryfast = 4;
 
+    private TLRPC.Chat currentChat;
+
     private final Runnable forwardSeek = new Runnable() {
         @Override
         public void run() {
@@ -458,6 +460,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
             } else {
                 TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-did);
                 if (chat != null) {
+                    currentChat = chat;
                     actionBar.setTitle(chat.title);
                 }
             }
@@ -1049,6 +1052,8 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
         optionsButton.setDelegate(this::onSubItemClick);
         optionsButton.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
 
+        applyNoForwards(currentChat != null && currentChat.noforwards);
+
         emptyView = new LinearLayout(context);
         emptyView.setOrientation(LinearLayout.VERTICAL);
         emptyView.setGravity(Gravity.CENTER);
@@ -1615,7 +1620,28 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                     seekBarView.setBufferedProgress(bufferedProgress);
                 }
             }
+        } else if (id == NotificationCenter.channelRightsUpdated) {
+            TLRPC.Chat chat = (TLRPC.Chat) args[0];
+            if (currentChat != null && chat.id == currentChat.id && currentChat.noforwards != chat.noforwards) {
+                applyNoForwards(chat.noforwards);
+                currentChat = chat;
+            }
         }
+    }
+
+    private void applyNoForwards(boolean newValue) {
+        if (newValue) {
+            optionsButton.hideSubItem(1);
+            optionsButton.hideSubItem(2);
+            optionsButton.hideSubItem(5);
+            optionsButton.setAdditionalYOffset(-AndroidUtilities.dp(45f));
+        } else {
+            optionsButton.showSubItem(1);
+            optionsButton.showSubItem(2);
+            optionsButton.showSubItem(5);
+            optionsButton.setAdditionalYOffset(-AndroidUtilities.dp(157));
+        }
+
     }
 
     @Override

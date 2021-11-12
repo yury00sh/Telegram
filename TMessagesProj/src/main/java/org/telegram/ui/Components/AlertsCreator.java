@@ -234,6 +234,10 @@ public class AlertsCreator {
                 case "SCHEDULE_TOO_MUCH":
                     showSimpleToast(fragment, LocaleController.getString("MessageScheduledLimitReached", R.string.MessageScheduledLimitReached));
                     break;
+                case "CHAT_FORWARDS_RESTRICTED":
+                    TLRPC.TL_messages_forwardMessages r = (TLRPC.TL_messages_forwardMessages) request;
+                    showSimpleToast(fragment, LocaleController.getString("NoforwardsPopupGroup", R.string.NoforwardsPopupChannel));
+                    break;
             }
         } else if (request instanceof TLRPC.TL_messages_importChatInvite) {
             if (error.text.startsWith("FLOOD_WAIT")) {

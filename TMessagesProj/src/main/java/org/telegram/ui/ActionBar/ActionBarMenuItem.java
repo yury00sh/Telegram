@@ -165,6 +165,9 @@ public class ActionBarMenuItem extends FrameLayout {
     private int selectedFilterIndex = -1;
     private int notificationIndex = -1;
 
+    private OnClickListener onDisabledClickListener;
+
+
     private float transitionOffset;
     private View showSubMenuFrom;
     private final Theme.ResourcesProvider resourcesProvider;
@@ -286,6 +289,10 @@ public class ActionBarMenuItem extends FrameLayout {
             } else if (showSubmenuByMove) {
                 popupWindow.dismiss();
             }
+        } else if (!isEnabled() && event.getActionMasked() == MotionEvent.ACTION_UP) {
+            if (onDisabledClickListener != null) {
+                onDisabledClickListener.onClick(this);
+            }
         } else {
             if (selectedMenuView != null) {
                 selectedMenuView.setSelected(false);
@@ -329,6 +336,10 @@ public class ActionBarMenuItem extends FrameLayout {
 
     public void setForceSmoothKeyboard(boolean value) {
         forceSmoothKeyboard = value;
+    }
+
+    public void setOnDisabledClickListener(OnClickListener listener) {
+        onDisabledClickListener = listener;
     }
 
     private void createPopupLayout() {
@@ -1609,6 +1620,26 @@ public class ActionBarMenuItem extends FrameLayout {
         }
         View view = popupLayout.findViewWithTag(id);
         return view != null && view.getVisibility() == VISIBLE;
+    }
+
+    public int getSubItemsCount() {
+        if (popupLayout == null) {
+            return 0;
+        }
+        return popupLayout.getItemsCount();
+    }
+
+    public int getVisibleSubItemsCount() {
+        if (popupLayout == null) {
+            return 0;
+        }
+        int acc = 0;
+        for (int i = 0; i < popupLayout.getItemsCount(); i++) {
+            if (popupLayout.getItemAt(i).getVisibility() == View.VISIBLE) {
+                acc++;
+            }
+        }
+        return acc;
     }
 
     public void showSubItem(int id) {

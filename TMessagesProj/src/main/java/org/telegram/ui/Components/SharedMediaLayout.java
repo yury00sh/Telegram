@@ -423,6 +423,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     private boolean scrolling;
     private long mergeDialogId;
     private TLRPC.ChatFull info;
+    private boolean noForwardsEnabled;
 
     private AnimatorSet tabsAnimation;
     private boolean tabsAnimationInProgress;
@@ -1105,6 +1106,12 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             }
         }
 
+        noForwardsEnabled = false;
+        TLRPC.Chat currentChat = DialogObject.isChatDialog(dialog_id) ? parent.getMessagesController().getChat(-dialog_id) : null;
+        if (currentChat != null && currentChat.noforwards) {
+            noForwardsEnabled = true;
+        }
+
         profileActivity = parent;
         actionBar = profileActivity.getActionBar();
         mediaColumnsCount = SharedConfig.mediaColumnsCount;
@@ -1116,6 +1123,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         profileActivity.getNotificationCenter().addObserver(this, NotificationCenter.messagePlayingDidReset);
         profileActivity.getNotificationCenter().addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         profileActivity.getNotificationCenter().addObserver(this, NotificationCenter.messagePlayingDidStart);
+        profileActivity.getNotificationCenter().addObserver(this, NotificationCenter.channelRightsUpdated);
 
         for (int a = 0; a < 10; a++) {
             //cellCache.add(new SharedPhotoVideoCell(context));
@@ -1432,6 +1440,13 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             actionModeLayout.addView(forwardItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
             actionModeViews.add(forwardItem);
             forwardItem.setOnClickListener(v -> onActionBarItemClick(forward));
+
+            if (noForwardsEnabled) {
+                forwardItem.setAlpha(.5f);
+                forwardItem.setEnabled(false);
+            }
+            forwardItem.setOnDisabledClickListener(this::showNoForwardsHint);
+
         }
         deleteItem = new ActionBarMenuItem(context, null, Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2), false);
         deleteItem.setIcon(R.drawable.msg_delete);
@@ -2853,6 +2868,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         profileActivity.getNotificationCenter().removeObserver(this, NotificationCenter.messagePlayingDidReset);
         profileActivity.getNotificationCenter().removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         profileActivity.getNotificationCenter().removeObserver(this, NotificationCenter.messagePlayingDidStart);
+        profileActivity.getNotificationCenter().removeObserver(this, NotificationCenter.channelRightsUpdated);
     }
 
     private void checkCurrentTabValid() {
@@ -3478,6 +3494,44 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         actionModeAnimation.start();
     }
 
+    public HintView noForwardsHintView;
+
+    private void showNoForwardsHint(View view) {
+        TLRPC.Chat currentChat = DialogObject.isChatDialog(dialog_id) ? profileActivity.getMessagesController().getChat(-dialog_id) : null;
+        if (currentChat == null || !currentChat.noforwards || profileActivity.getParentActivity() == null || actionModeLayout == null) {
+            return;
+        }
+        if (noForwardsHintView == null) {
+            int index = indexOfChild(actionModeLayout);
+            if (index == -1) {
+                return;
+            }
+//            setClipChildren(false);
+            noForwardsHintView = new HintView(profileActivity.getParentActivity(), 7, true);
+            addView(noForwardsHintView, index + 1,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
+        }
+
+        if (ChatObject.isChannel(currentChat) && !currentChat.megagroup) {
+            noForwardsHintView.setText(LocaleController.getString("NoforwardsPopupChannel", R.string.NoforwardsPopupChannel));
+        } else {
+            noForwardsHintView.setText(LocaleController.getString("NoforwardsPopupChat", R.string.NoforwardsPopupChat));
+        }
+
+        noForwardsHintView.showForView(view, true);
+    }
+
+    private void updateNoForwards(boolean oldValue, boolean newValue) {
+        if (forwardItem != null) {
+            if (newValue && !oldValue) {
+                forwardItem.setEnabled(false);
+                forwardItem.setAlpha(.5f);
+            } else if (!newValue && oldValue) {
+                forwardItem.setEnabled(true);
+                forwardItem.setAlpha(1f);
+            }
+        }
+    }
+
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.mediaDidLoad) {
@@ -3799,6 +3853,12 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                         }
                     }
                 }
+            }
+        } else if (id == NotificationCenter.channelRightsUpdated) {
+            TLRPC.Chat chat = (TLRPC.Chat) args[0];
+            if (chat.id == -dialog_id && chat.noforwards != noForwardsEnabled) {
+                updateNoForwards(noForwardsEnabled, chat.noforwards);
+                noForwardsEnabled = chat.noforwards;
             }
         }
     }

@@ -478,6 +478,11 @@ public class HintView extends FrameLayout {
         this.bottomOffset = offset;
     }
 
+    public void setArrowTop(boolean top) {
+        this.isTopArrow = top;
+    }
+
+
     private int getThemedColor(String key) {
         Integer color = resourcesProvider != null ? resourcesProvider.getColor(key) : null;
         return color != null ? color : Theme.getColor(key);

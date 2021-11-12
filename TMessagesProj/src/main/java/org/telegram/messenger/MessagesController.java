@@ -2917,6 +2917,8 @@ public class MessagesController extends BaseController implements NotificationCe
         if (chat.min) {
             if (oldChat != null) {
                 if (!fromCache) {
+                    boolean rightsChanged = false;
+
                     oldChat.title = chat.title;
                     oldChat.photo = chat.photo;
                     oldChat.broadcast = chat.broadcast;
@@ -2925,14 +2927,17 @@ public class MessagesController extends BaseController implements NotificationCe
                     oldChat.call_not_empty = chat.call_not_empty;
                     oldChat.call_active = chat.call_active;
                     if (chat.default_banned_rights != null) {
+                        rightsChanged = true;
                         oldChat.default_banned_rights = chat.default_banned_rights;
                         oldChat.flags |= 262144;
                     }
-                    if (chat.admin_rights != null) {
+                    if (chat.admin_rights != null && chat.admin_rights != oldChat.admin_rights) {
+                        rightsChanged = true;
                         oldChat.admin_rights = chat.admin_rights;
                         oldChat.flags |= 16384;
                     }
-                    if (chat.banned_rights != null) {
+                    if (chat.banned_rights != null && chat.banned_rights != oldChat.banned_rights) {
+                        rightsChanged = true;
                         oldChat.banned_rights = chat.banned_rights;
                         oldChat.flags |= 32768;
                     }
@@ -2945,6 +2950,13 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                     if (chat.participants_count != 0) {
                         oldChat.participants_count = chat.participants_count;
+                    }
+                    if (chat.noforwards != oldChat.noforwards) {
+                        oldChat.noforwards = true;
+                        rightsChanged = true;
+                    }
+                    if (rightsChanged) {
+                        AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.channelRightsUpdated, oldChat));
                     }
                     addOrRemoveActiveVoiceChat(oldChat);
                 }
@@ -2967,6 +2979,8 @@ public class MessagesController extends BaseController implements NotificationCe
                     int newFlags = chat.banned_rights != null ? chat.banned_rights.flags : 0;
                     int oldFlags2 = oldChat.default_banned_rights != null ? oldChat.default_banned_rights.flags : 0;
                     int newFlags2 = chat.default_banned_rights != null ? chat.default_banned_rights.flags : 0;
+                    boolean oldSaveRestricted = oldChat.noforwards;
+                    boolean newSaveRestricted = chat.noforwards;
                     oldChat.default_banned_rights = chat.default_banned_rights;
                     if (oldChat.default_banned_rights == null) {
                         oldChat.flags &=~ 262144;
@@ -2985,7 +2999,7 @@ public class MessagesController extends BaseController implements NotificationCe
                     } else {
                         oldChat.flags |= 16384;
                     }
-                    if (oldFlags != newFlags || oldFlags2 != newFlags2) {
+                    if (oldFlags != newFlags || oldFlags2 != newFlags2 || oldSaveRestricted != newSaveRestricted) {
                         AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.channelRightsUpdated, chat));
                     }
                 }
@@ -9093,6 +9107,24 @@ public class MessagesController extends BaseController implements NotificationCe
     public void toogleChannelSignatures(long chatId, boolean enabled) {
         TLRPC.TL_channels_toggleSignatures req = new TLRPC.TL_channels_toggleSignatures();
         req.channel = getInputChannel(chatId);
+        req.enabled = enabled;
+        getConnectionsManager().sendRequest(req, (response, error) -> {
+            if (response != null) {
+                processUpdates((TLRPC.Updates) response, false);
+                AndroidUtilities.runOnUIThread(() -> getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, UPDATE_MASK_CHAT));
+            }
+        }, ConnectionsManager.RequestFlagInvokeAfter);
+    }
+
+    public void toggleChatNoForwards(long chatId, boolean enabled) {
+        TLRPC.TL_messages_toggleNoForwards req = new TLRPC.TL_messages_toggleNoForwards();
+        boolean isChannel = ChatObject.isChannel(chatId, currentAccount);
+        if (isChannel) {
+            req.peer = getInputPeer(-chatId);
+        } else {
+            req.peer = new TLRPC.TL_inputPeerChat();
+            req.peer.chat_id = chatId;
+        }
         req.enabled = enabled;
         getConnectionsManager().sendRequest(req, (response, error) -> {
             if (response != null) {

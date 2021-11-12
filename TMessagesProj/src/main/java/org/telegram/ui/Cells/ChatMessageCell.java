@@ -616,6 +616,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public long linkedChatId;
     public boolean isRepliesChat;
     public boolean isPinnedChat;
+    public boolean isNoForwardsEnabled;
     private boolean isPressed;
     private boolean forwardName;
     private boolean isHighlighted;
@@ -3078,6 +3079,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         if (!messageChanged && messageObject.isDice()) {
             setCurrentDiceValue(isUpdating);
+        }
+        if (isNoForwardsEnabled == (drawSideButton == 1)) {
+            dataChanged = true;
         }
         if (!messageChanged && messageObject.isPoll()) {
             ArrayList<TLRPC.TL_pollAnswerVoters> newResults = null;
@@ -9602,6 +9606,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (currentMessageObject.deleted || currentMessageObject.isSponsored()) {
             return false;
         }
+        if (isNoForwardsEnabled || (currentChat != null && currentChat.noforwards)) {
+            return false;
+        }
         if (currentPosition != null) {
             if (!currentMessagesGroup.isDocuments && !currentPosition.last) {
                 return false;
@@ -9655,6 +9662,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 currentChat = messagesController.getChat(currentMessageObject.messageOwner.peer_id.channel_id);
             }
         }
+        isNoForwardsEnabled = currentChat != null && currentChat.noforwards;
     }
 
     private void setMessageObjectInternal(MessageObject messageObject) {

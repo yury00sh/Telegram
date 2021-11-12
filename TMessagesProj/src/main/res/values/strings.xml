@@ -374,6 +374,8 @@
     <string name="ChannelUsernamePlaceholder">link</string>
     <string name="ChannelPrivateLinkHelp">People can join your channel by following this link. You can revoke the link any time.</string>
     <string name="MegaPrivateLinkHelp">People can join your group by following this link. You can revoke the link any time.</string>
+    <string name="SaveRestrictionsChannelHelp">Participants won\'t be able to forward messages from this channel or save media files.</string>
+    <string name="SaveRestrictionsChatHelp">Participants won\'t be able to forward messages from this group or save media files.</string>
     <string name="DescriptionOptionalPlaceholder">Description (optional)</string>
     <string name="DescriptionPlaceholder">Description</string>
     <string name="DescriptionInfo">You can provide an optional description for your channel.</string>
@@ -590,8 +592,10 @@
     <string name="ChannelSettingsTitle">Channel Settings</string>
     <string name="TypePrivate">Private</string>
     <string name="TypePublic">Public</string>
+    <string name="TypePrivateRestricted">Private restricted</string>
     <string name="TypePrivateGroup">Private</string>
     <string name="TypePublicGroup">Public</string>
+    <string name="TypePrivateRestrictedGroup">Private restricted</string>
     <string name="TypeLocationGroup">Link</string>
     <string name="TypeLocationGroupEdit">Tap to add a permanent link</string>
     <string name="ChoosePhoto">Choose photo</string>
@@ -826,6 +830,8 @@
     <string name="EventLogVoiceChatUnmuted">un1 unmuted un2</string>
     <string name="EventLogVoiceChatAllowedToSpeak">un1 allowed new participants to speak</string>
     <string name="EventLogVoiceChatNotAllowedToSpeak">un1 muted new participants</string>
+    <string name="EventLogNoForwardsToggledOn">un1 restricted saving content</string>
+    <string name="EventLogNoForwardsToggledOff">un1 allowed saving content</string>
     <!--broadcasts-->
     <string name="NewBroadcastList">New Broadcast List</string>
     <string name="EnterListName">Enter list name</string>
@@ -968,6 +974,8 @@
     <string name="ApplyThemeFile">Apply theme file</string>
     <string name="UnsupportedAttachment">Unsupported attachment</string>
     <string name="SetTimer">Set self-destruct timer</string>
+    <string name="NoforwardsPopupChannel">Forwards from this channel are\u00A0restricted.</string>
+    <string name="NoforwardsPopupChat">Forwards from this group are\u00A0restricted.</string>
     <string name="ServiceNotifications">Service notifications</string>
     <string name="GettingLinkInfo">Getting Link Info...</string>
     <string name="OpenInBrowser">OPEN IN...</string>
