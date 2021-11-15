@@ -16279,7 +16279,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     TLRPC.Peer l = chatActivityEnterView.getSendAs();
                     if (l != null && !(l instanceof TLRPC.TL_peerUser)) {
                         boolean lost = true;
-                        for (int i = 1; i < sendAsPeers.size(); i++) {
+                        for (int i = 0; i < sendAsPeers.size(); i++) {
+                            if (sendAsPeers.get(i) instanceof TLRPC.TL_peerUser) {
+                                continue;
+                            }
                             if (sendAsPeers.get(i).channel_id == l.channel_id) {
                                 lost = false;
                                 break;
