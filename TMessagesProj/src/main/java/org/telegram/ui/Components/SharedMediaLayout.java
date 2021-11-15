@@ -3507,8 +3507,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 return;
             }
             boolean faceDown = profileActivity instanceof ProfileActivity;
-            noForwardsHintView = faceDown ? new HintView(profileActivity.getParentActivity(), 7, true) : new HintView(getParentActivity(), 9, false);
-            addView(noForwardsHintView, index + 1,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
+            if (faceDown) {
+                noForwardsHintView = new HintView(profileActivity.getParentActivity(), 7, true);
+                addView(noForwardsHintView, index + 1,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
+            } else {
+                FrameLayout parent = (FrameLayout) profileActivity.getActionBar().getParent();
+                noForwardsHintView = new HintView(profileActivity.getParentActivity(), 9, false);
+                parent.addView(noForwardsHintView,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
+            }
+
         }
 
         if (ChatObject.isChannel(currentChat) && !currentChat.megagroup) {

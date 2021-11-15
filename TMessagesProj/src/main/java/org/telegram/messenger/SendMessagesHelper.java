@@ -29,6 +29,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -5547,6 +5548,13 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             }
                         }
                     } else {
+                        if (error.text.equals("SEND_AS_PEER_INVALID")) { //sorry for doing it here
+                            MessagesController mc = getMessagesController();
+                            long chat_id = msgObj.getChatId();
+                            Log.w("NOTIF", String.valueOf(chat_id));
+                            mc.getChatFull(chat_id);
+                            mc.loadChannelSendAs(mc.getInputPeer(-chat_id));
+                        }
                         AlertsCreator.processError(currentAccount, error, null, req);
                         isSentError = true;
                     }

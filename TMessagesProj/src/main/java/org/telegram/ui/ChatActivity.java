@@ -15069,6 +15069,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 showGigagroupConvertAlert();
                 long prevLinkedChatId = chatInfo != null ? chatInfo.linked_chat_id : 0;
                 chatInfo = chatFull;
+                if (!sendAsAwareness) {
+                    chatActivityEnterView.setSendAsPeer(chatInfo.default_send_as);
+                    sendAsAwareness = true;
+                }
                 groupCall = getMessagesController().getGroupCall(currentChat.id, true);
                 if (ChatObject.isChannel(currentChat) && currentChat.megagroup && fragmentContextView != null) {
                     fragmentContextView.checkCall(openAnimationStartTime == 0 || SystemClock.elapsedRealtime() < openAnimationStartTime + 150);
@@ -15169,7 +15173,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
             updateSendAsMenu();
-            sendAsAwareness = true;
         } else if (id == NotificationCenter.chatInfoCantLoad) {
             long chatId = (Long) args[0];
             if (currentChat != null && currentChat.id == chatId) {
@@ -16272,10 +16275,22 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (currentChat != null) {
                 if (((TLRPC.InputPeer) args[0]).channel_id == currentChat.id) {
                     sendAsPeers = (ArrayList<TLRPC.Peer>) args[1];
-                    updateSendAsMenu();
-                    if (chatInfo != null) {
-                        chatActivityEnterView.setSendAsPeer(chatInfo.default_send_as);
+                    TLRPC.Peer l = chatActivityEnterView.getSendAs();
+                    if (l != null && !(l instanceof TLRPC.TL_peerUser)) {
+                        boolean lost = true;
+                        for (int i = 1; i < sendAsPeers.size(); i++) {
+                            if (sendAsPeers.get(i).channel_id == l.channel_id) {
+                                lost = false;
+                                break;
+                            }
+                        }
+                        if (lost) {
+                            String name = getMessagesController().getChat(l.channel_id).title;
+                            AlertsCreator.createSimpleAlert(fragmentView.getContext(), "You cannot use " + name + " identity in this group anymore."); // alert stops user from accidentally sending the message
+                            chatActivityEnterView.setSendAsPeer(chatInfo == null ? null : chatInfo.default_send_as);
+                        }
                     }
+                    updateSendAsMenu();
                     if (chatActivityEnterView.getSendAsButtonState() == 2) {
                         chatActivityEnterView.setSendAsButtonState(1);
                         openSendAsMenu(true);
