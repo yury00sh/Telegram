@@ -5384,6 +5384,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         });
 
         if (currentChat != null) {
+            chatInfo = getMessagesController().getChatFull(currentChat.id);
             pendingRequestsDelegate = new ChatActivityMemberRequestsDelegate(this, currentChat, this::invalidateChatListViewTopPadding);
             pendingRequestsDelegate.setChatInfo(chatInfo, false);
             contentView.addView(pendingRequestsDelegate.getView(), ViewGroup.LayoutParams.MATCH_PARENT, pendingRequestsDelegate.getViewHeight());

@@ -1673,6 +1673,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             TLRPC.User user = parentFragment.getMessagesController().getUser(peer.user_id);
             sendAsButton.setAvatarPeer(user);
         } else {
+            sendAsButton.setVisibility(View.GONE);
             return;
         }
         this.sendAs = peer;

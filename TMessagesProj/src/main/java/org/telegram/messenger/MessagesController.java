@@ -10540,6 +10540,11 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void saveDefaultSendAs(TLRPC.InputPeer peer, TLRPC.InputPeer sendAs) {
         TLRPC.TL_messages_saveDefaultSendAs req = new TLRPC.TL_messages_saveDefaultSendAs();
+        TLRPC.ChatFull info = getChatFull(peer.channel_id);
+        if (info != null) {
+            info.default_send_as = peer instanceof TLRPC.TL_inputPeerChannel ? getPeer(-peer.channel_id) : getPeer(peer.user_id);
+            putChatFull(info);
+        }
         req.peer = peer;
         req.send_as = sendAs;
         getConnectionsManager().sendRequest(req, (response, err) -> AndroidUtilities.runOnUIThread(() -> {
@@ -10548,9 +10553,11 @@ public class MessagesController extends BaseController implements NotificationCe
             }
             boolean res = response instanceof TLRPC.TL_boolTrue;
             if (res) {
-                TLRPC.ChatFull info = getChatFull(peer.channel_id);
-                info.default_send_as = peer instanceof TLRPC.TL_inputPeerChannel ? getPeer(-peer.channel_id) : getPeer(peer.chat_id);
-                putChatFull(info);
+                TLRPC.ChatFull info2 = getChatFull(peer.channel_id);
+                if (info2 != null) {
+                    info2.default_send_as = peer instanceof TLRPC.TL_inputPeerChannel ? getPeer(-peer.channel_id) : getPeer(peer.user_id);
+                    putChatFull(info2);
+                }
             }
             getNotificationCenter().postNotificationName(NotificationCenter.channelDidSaveSendAs, req.peer, res);
         }));
