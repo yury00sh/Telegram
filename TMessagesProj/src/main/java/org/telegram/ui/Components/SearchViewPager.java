@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -81,6 +82,8 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
 
     ChatPreviewDelegate chatPreviewDelegate;
 
+    private int cantForwardCounter;
+
     private final int folderId;
     int animateFromCount = 0;
 
@@ -89,6 +92,7 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
         this.folderId = folderId;
         parent = fragment;
         this.chatPreviewDelegate = chatPreviewDelegate;
+        cantForwardCounter = 0;
         dialogsSearchAdapter = new DialogsSearchAdapter(context, type, initialDialogsType) {
             @Override
             public void notifyDataSetChanged() {
@@ -330,6 +334,7 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
         if (isActionModeShowed == show) {
             return;
         }
+        cantForwardCounter = 0;
         if (show && parent.getActionBar().isActionModeShowed()) {
             return;
         }
@@ -345,6 +350,7 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
 
             gotoItem = actionMode.addItemWithWidth(gotoItemId, R.drawable.msg_message, AndroidUtilities.dp(54), LocaleController.getString("AccDescrGoToMessage", R.string.AccDescrGoToMessage));
             forwardItem = actionMode.addItemWithWidth(forwardItemId, R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("Forward", R.string.Forward));
+            forwardItem.setOnDisabledClickListener(this::showNoForwardsHint);
         }
         if (parent.getActionBar().getBackButton().getDrawable() instanceof MenuDrawable) {
             parent.getActionBar().setBackButtonDrawable(new BackDrawable(false));
@@ -454,6 +460,31 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
         showActionMode(false);
     }
 
+    public HintView noForwardsHintView;
+
+    private void showNoForwardsHint(View view) {
+        if (parent == null || parent.getFragmentView() == null || !(parent.getFragmentView() instanceof FrameLayout)) {
+            return;
+        }
+        if (noForwardsHintView == null) {
+            FrameLayout parentLayout = ((FrameLayout) parent.getFragmentView());
+            int index = parentLayout.indexOfChild(parent.getActionBar());
+            if (index == -1) {
+                return;
+            }
+            noForwardsHintView = new HintView(parent.getParentActivity(), 7, true);
+            noForwardsHintView.setText(LocaleController.getString("NoforwardsPopupMixed", R.string.NoforwardsPopupMixed));
+
+            parentLayout.addView(noForwardsHintView, index + 1,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
+        }
+        noForwardsHintView.showForView(view, true);
+    }
+
+    private void setForwardEnabled(boolean enabled) {
+        forwardItem.setEnabled(enabled);
+        forwardItem.setAlpha(enabled ? 1f : 0.5f);
+    }
+
     @Override
     public int getFolderId() {
         return folderId;
@@ -472,13 +503,21 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
         FilteredSearchView.MessageHashId hashId = new FilteredSearchView.MessageHashId(message.getId(), message.getDialogId());
         if (selectedFiles.containsKey(hashId)) {
             selectedFiles.remove(hashId);
+            if (!message.canForwardMessageWithNoForwards()) {
+                cantForwardCounter--;
+            }
         } else {
+            if (!message.canForwardMessageWithNoForwards()) {
+                cantForwardCounter++;
+            }
             if (selectedFiles.size() >= 100) {
                 return;
             }
             selectedFiles.put(hashId, message);
         }
+        setForwardEnabled(cantForwardCounter == 0);
         if (selectedFiles.size() == 0) {
+            cantForwardCounter = 0;
             showActionMode(false);
         } else {
             selectedMessagesCountTextView.setNumber(selectedFiles.size(), true);

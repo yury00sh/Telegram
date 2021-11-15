@@ -6889,9 +6889,17 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     // no saner way of doing this given the time...
     private void applyNoForwards(boolean updateItemStates) {
         boolean noForwards = false;
+        if (currentDialogId == 0 && currentMessageObject != null) {
+            TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-currentMessageObject.getDialogId());
+            if (chat != null) {
+                noForwards = chat.noforwards;
+            }
+        }
         if (currentDialogId != 0 && DialogObject.isChatDialog(currentDialogId)) {
             TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-currentDialogId);
-            noForwards = chat.noforwards;
+            if (chat != null) {
+                noForwards = chat.noforwards;
+            }
         }
         if (noForwards) {
             // Common for the entire gallery
