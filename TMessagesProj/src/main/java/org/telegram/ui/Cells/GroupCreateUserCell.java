@@ -39,6 +39,9 @@ import org.telegram.ui.Components.LayoutHelper;
 
 public class GroupCreateUserCell extends FrameLayout {
 
+    public final static int BASIC_CHECKBOX = 1;
+    public final static int RADIAL_CHECKBOX = 1;
+
     private BackupImageView avatarImageView;
     private SimpleTextView nameTextView;
     private SimpleTextView statusTextView;

@@ -224,7 +224,7 @@ public class ChatObject {
             return (call.flags & 128) != 0;
         }
 
-        private long getSelfId() {
+        public long getSelfId() {
             long selfId;
             if (selfPeer != null) {
                 return MessageObject.getPeerId(selfPeer);

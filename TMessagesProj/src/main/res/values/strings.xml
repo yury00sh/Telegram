@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="AppName">Telegram</string>
+    <string name="AppName">Telegram Sweet Yak</string>
     <string name="AppNameBeta">Telegram Beta</string>
     <string name="LanguageName">English</string>
     <string name="English">English</string>
@@ -976,7 +976,7 @@
     <string name="SetTimer">Set self-destruct timer</string>
     <string name="NoforwardsPopupChannel">Forwards from this channel are\u00A0restricted</string>
     <string name="NoforwardsPopupChat">Forwards from this group are\u00A0restricted</string>
-    <string name="NoforwardsPopupMixed">Some of selected messages are from chats that have restricted forwarding</string>
+    <string name="NoforwardsPopupMixed">Some of selected messages are from chats that restrict forwards</string>
     <string name="ServiceNotifications">Service notifications</string>
     <string name="GettingLinkInfo">Getting Link Info...</string>
     <string name="OpenInBrowser">OPEN IN...</string>
@@ -4818,4 +4818,5 @@
     <string name="UserAcceptedToGroupAction">un1 was accepted into the group</string>
     <string name="UserAcceptedToGroupPush">%1$s was accepted into the group</string>
     <string name="UserAcceptedToGroupPushWithGroup">%2$s|%1$s was accepted into the group</string>
+    <string name="SendAs">Send message as...</string>
 </resources>

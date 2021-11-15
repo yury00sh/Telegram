@@ -3506,8 +3506,8 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             if (index == -1) {
                 return;
             }
-//            setClipChildren(false);
-            noForwardsHintView = new HintView(profileActivity.getParentActivity(), 7, true);
+            boolean faceDown = profileActivity instanceof ProfileActivity;
+            noForwardsHintView = faceDown ? new HintView(profileActivity.getParentActivity(), 7, true) : new HintView(getParentActivity(), 9, false);
             addView(noForwardsHintView, index + 1,  LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 10, 0, 10, 0));
         }
 

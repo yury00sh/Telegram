@@ -2068,6 +2068,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public TLRPC.InputPeer getInputPeer(TLRPC.Peer peer) {
+        if (peer == null) {
+            return null;
+        }
         TLRPC.InputPeer inputPeer;
         if (peer instanceof TLRPC.TL_peerChat) {
             inputPeer = new TLRPC.TL_inputPeerChat();
@@ -6060,6 +6063,9 @@ public class MessagesController extends BaseController implements NotificationCe
         }
         if (dialogId < 0) {
             if (ChatObject.shouldSendAnonymously(getChat(-dialogId))) {
+                return false;
+            }
+            if (!(getChatFull(-dialogId) == null || getChatFull(-dialogId).default_send_as != null && getChatFull(-dialogId).default_send_as instanceof TLRPC.TL_peerUser)) {
                 return false;
             }
         } else {
@@ -10515,6 +10521,38 @@ public class MessagesController extends BaseController implements NotificationCe
                 getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, UPDATE_MASK_READ_DIALOG_MESSAGE);
                 loadingUnreadDialogs = false;
             }
+        }));
+    }
+
+    public void loadChannelSendAs(TLRPC.InputPeer peer) {
+        TLRPC.TL_channels_getSendAs req = new TLRPC.TL_channels_getSendAs();
+        req.peer = peer;
+        getConnectionsManager().sendRequest(req, (response, err) -> AndroidUtilities.runOnUIThread(() -> {
+            if (response == null) {
+                return;
+            }
+            TLRPC.TL_channels_sendAsPeers res = (TLRPC.TL_channels_sendAsPeers) response;
+            putUsers(res.users, false);
+            putChats(res.chats, false);
+            getNotificationCenter().postNotificationName(NotificationCenter.channelSendAsDidLoad, req.peer, res.peers);
+        }));
+    }
+
+    public void saveDefaultSendAs(TLRPC.InputPeer peer, TLRPC.InputPeer sendAs) {
+        TLRPC.TL_messages_saveDefaultSendAs req = new TLRPC.TL_messages_saveDefaultSendAs();
+        req.peer = peer;
+        req.send_as = sendAs;
+        getConnectionsManager().sendRequest(req, (response, err) -> AndroidUtilities.runOnUIThread(() -> {
+            if (err != null) {
+                getNotificationCenter().postNotificationName(NotificationCenter.channelSaveAsFailed, req.peer);
+            }
+            boolean res = response instanceof TLRPC.TL_boolTrue;
+            if (res) {
+                TLRPC.ChatFull info = getChatFull(peer.channel_id);
+                info.default_send_as = peer instanceof TLRPC.TL_inputPeerChannel ? getPeer(-peer.channel_id) : getPeer(peer.chat_id);
+                putChatFull(info);
+            }
+            getNotificationCenter().postNotificationName(NotificationCenter.channelDidSaveSendAs, req.peer, res);
         }));
     }
 

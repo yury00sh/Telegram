@@ -5689,6 +5689,14 @@ public class MessageObject {
         return !(messageOwner instanceof TLRPC.TL_message_secret) && !needDrawBluredPreview() && !isLiveLocation() && type != 16 && !isSponsored();
     }
 
+    public boolean canForwardMessageWithNoForwards() {
+        if (!canForwardMessage()) {
+            return false;
+        }
+        TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-messageOwner.dialog_id);
+        return chat == null || !chat.noforwards;
+    }
+
     public boolean canEditMedia() {
         if (isSecretMedia()) {
             return false;

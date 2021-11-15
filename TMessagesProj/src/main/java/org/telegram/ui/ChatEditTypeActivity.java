@@ -504,7 +504,7 @@ public class ChatEditTypeActivity extends BaseFragment implements NotificationCe
 
         if (isPrivate && currentChat.noforwards != isSaveRestricted) {
             getMessagesController().toggleChatNoForwards(chatId, isSaveRestricted);
-//            currentChat.noforwards = isSaveRestricted;
+            currentChat.noforwards = isSaveRestricted;
         }
         return true;
     }
