@@ -70,6 +70,10 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         default void needOpenInviteLink(TLRPC.TL_chatInviteExported invite) {
 
         }
+
+        default void onDateObjectClick(MessageObject dateObject) {
+
+        }
     }
 
     public interface ThemeDelegate extends Theme.ResourcesProvider {
@@ -301,6 +305,9 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
                     imagePressed = true;
                     result = true;
                 }
+                if (currentMessageObject.isDateObject) {
+                    result = true;
+                }
                 if (result) {
                     startCheckLongPress();
                 }
@@ -308,6 +315,9 @@ public class ChatActionCell extends BaseCell implements DownloadController.FileD
         } else {
             if (event.getAction() != MotionEvent.ACTION_MOVE) {
                 cancelCheckLongPress();
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP && currentMessageObject.isDateObject) {
+                delegate.onDateObjectClick(currentMessageObject);
             }
             if (imagePressed) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {

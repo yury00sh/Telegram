@@ -222,6 +222,7 @@ import org.telegram.ui.Components.ReportAlert;
 import org.telegram.ui.Components.SearchCounterView;
 import org.telegram.ui.Components.SendAsMenuItem;
 import org.telegram.ui.Components.ShareAlert;
+import org.telegram.ui.Components.SharedMediaLayout;
 import org.telegram.ui.Components.Size;
 import org.telegram.ui.Components.SizeNotifierFrameLayout;
 import org.telegram.ui.Components.StickersAlert;
@@ -23890,6 +23891,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             return;
                         }
                         chatActivityEnterView.didPressedBotButton(button, messageObject, messageObject);
+                    }
+
+                    @Override
+                    public void onDateObjectClick(MessageObject dateObject) {
+                        Bundle args = new Bundle();
+                        args.putLong("dialog_id", dialog_id);
+                        ChatHistoryCalendarActivity calendar = new ChatHistoryCalendarActivity(args, SharedMediaLayout.FILTER_PHOTOS_AND_VIDEOS, dateObject.messageOwner.date);
+                        calendar.setCallback((int messageId, int startOffset) -> {
+                            scrollToMessageId(messageId,0,false,0,true,0);
+                        });
+                        presentFragment(calendar);
                     }
                 });
             } else if (viewType == 2) {
