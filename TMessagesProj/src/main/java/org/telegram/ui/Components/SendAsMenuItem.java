@@ -44,6 +44,7 @@ public class SendAsMenuItem extends FrameLayout {
         checkBox.setColor(Theme.key_dialogRoundCheckBox, Theme.key_dialogBackground, Theme.key_dialogRoundCheckBoxCheck);
         checkBox.setDrawUnchecked(false);
         checkBox.setDrawBackgroundAsArc(4);
+        checkBox.setDuration(150);
         checkBox.setProgressDelegate(progress -> {
             float scale = 1.0f - (1.0f - 0.857f) * checkBox.getProgress();
             avatarImageView.setScaleX(scale);

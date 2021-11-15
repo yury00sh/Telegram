@@ -97,6 +97,12 @@ public class CheckBoxBase {
         bitmapCanvas = new Canvas(drawBitmap);
     }
 
+    private int duration = 200;
+
+    public void setDuration(int mills) {
+        duration = mills;
+    }
+
     public void onAttachedToWindow() {
         attachedToWindow = true;
     }
@@ -190,7 +196,7 @@ public class CheckBoxBase {
             }
         });
         checkAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
-        checkAnimator.setDuration(200);
+        checkAnimator.setDuration(duration);
         checkAnimator.start();
     }
 

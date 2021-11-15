@@ -33,6 +33,10 @@ public class CheckBox2 extends View {
         checkBoxBase.setChecked(checked, animated);
     }
 
+    public void setDuration(int mills) {
+        checkBoxBase.setDuration(mills);
+    }
+
     public void setNum(int num) {
         checkBoxBase.setNum(num);
     }
