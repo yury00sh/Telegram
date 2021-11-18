@@ -7180,6 +7180,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             public void didPressSendAsButton() {
                 if (sendAsPeers == null) {
                     chatActivityEnterView.setSendAsButtonState(2);
+                    return;
                 }
 
                 chatActivityEnterView.setSendAsButtonState(showSendAs ? 0 : 1);
