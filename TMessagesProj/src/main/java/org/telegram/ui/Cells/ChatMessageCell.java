@@ -8756,7 +8756,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public boolean shouldConsiderReactions() {
-        return reactionCounts != null && (currentPosition == null || (currentPosition.flags & MessageObject.POSITION_FLAG_BOTTOM) != 0);
+        return reactionCounts != null && reactionCounts.size() != 0 && (currentPosition == null || (currentPosition.flags & MessageObject.POSITION_FLAG_BOTTOM) != 0);
     }
 
     public void updateCaptionLayout() {
@@ -9899,15 +9899,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 timeWidth += AndroidUtilities.dp(18);
             }
         }
-//        if (DialogObject.isUserDialog(currentMessageObject.getDialogId()) && reactionCounts != null) {
-//            int size = 0;
-//            if (reactionCounts.size() == 2) {
-//                size = 2;
-//            } else if (reactionCounts.size() == 1) {
-//                size = reactionCounts.get(0).count;
-//            }
-//            timeWidth += AndroidUtilities.dp(21) * size;
-//        }
         if (signString != null) {
             if (availableTimeWidth == 0) {
                 availableTimeWidth = AndroidUtilities.dp(1000);
@@ -12104,6 +12095,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
 
         if (reactionChips != null && isManagingReactions()) {
+//            Theme.chat_docBackPaint.setAlpha(150);
+//            canvas.drawRect(reactionX, reactionY, reactionEndX, reactionY + reactionsHeight, Theme.chat_docBackPaint);
             for (int i = 0; i < reactionChips.size(); i++) {
                 ReactionChip chip = reactionChips.get(i);
                 if (chip.isElevated() || chip.getVisibility() == View.GONE) continue;
@@ -12112,6 +12105,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 chip.drawAfter(canvas);
                 canvas.translate(-chip.getX(), -chip.getY());
             }
+        } else if (currentPosition != null && (currentPosition.flags & MessageObject.POSITION_FLAG_BOTTOM) != 0) {
+//            Theme.chat_docBackPaint.setAlpha(90);
+//            canvas.drawRect(reactionX, reactionY, reactionEndX, reactionY + reactionsHeight, Theme.chat_docBackPaint);
         }
 
         if (captionLayout == null || selectionOnly && pressedLink == null || (currentMessageObject.deleted && currentPosition != null) || alpha == 0) {
