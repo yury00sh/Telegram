@@ -20,6 +20,7 @@ import android.util.Property;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -39,7 +40,7 @@ public class TextCheckCell extends FrameLayout {
 
     private TextView textView;
     private TextView valueTextView;
-    private Switch checkBox;
+    protected Switch checkBox;
     private boolean needDivider;
     private boolean isMultiline;
     private int height = 50;
@@ -49,6 +50,7 @@ public class TextCheckCell extends FrameLayout {
     private float lastTouchX;
     private ObjectAnimator animator;
     private boolean drawCheckRipple;
+    private boolean fillMode = false;
 
     public static final Property<TextCheckCell, Float> ANIMATION_PROGRESS = new AnimationProperties.FloatProperty<TextCheckCell>("animationProgress") {
         @Override
@@ -128,6 +130,21 @@ public class TextCheckCell extends FrameLayout {
         layoutParams.topMargin = 0;
         textView.setLayoutParams(layoutParams);
         setWillNotDraw(!divider);
+    }
+
+    View prependIcon;
+
+    public void setPrependIcon(View prependIcon) {
+        if (this.prependIcon != null) {
+            removeView(this.prependIcon);
+        }
+        if (prependIcon != null) {
+            addView(prependIcon, LayoutHelper.createFrame(28, 28, (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.CENTER_VERTICAL, 19, 0, 0, 0));
+            ((LayoutParams) textView.getLayoutParams()).leftMargin = AndroidUtilities.dp(72);
+        } else {
+            ((LayoutParams) textView.getLayoutParams()).leftMargin = LocaleController.isRTL ? 70 : 21;
+        }
+        this.prependIcon = prependIcon;
     }
 
     public void setColors(String key, String switchKey, String switchKeyChecked, String switchThumb, String switchThumbChecked) {
@@ -252,6 +269,16 @@ public class TextCheckCell extends FrameLayout {
         checkBox.setOverrideColorProgress(cx, cy, animatedRad);
     }
 
+    private Paint fillPaint;
+
+    public void setFillColor(int fillColor) {
+        if (fillPaint == null) {
+            fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        }
+        fillPaint.setColor(fillColor);
+        fillMode = fillColor != -1;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (animatedColorBackground != 0) {
@@ -260,6 +287,16 @@ public class TextCheckCell extends FrameLayout {
             int cy = getMeasuredHeight() / 2;
             float animatedRad = rad * animationProgress;
             canvas.drawCircle(cx, cy, animatedRad, animationPaint);
+        }
+        if (fillMode) {
+            float progress = checkBox.getProgress();
+            float x = checkBox.getX();
+            float rad = Math.max(x, this.getMeasuredWidth() - x) + AndroidUtilities.dp(40);
+            float cx = x;
+            int cy = this.getMeasuredHeight() / 2;
+            float animatedRad = rad * progress;
+            canvas.drawCircle(cx, cy, animatedRad, fillPaint);
+            super.onDraw(canvas);
         }
         if (needDivider) {
             canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(20), getMeasuredHeight() - 1, getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0), getMeasuredHeight() - 1, Theme.dividerPaint);

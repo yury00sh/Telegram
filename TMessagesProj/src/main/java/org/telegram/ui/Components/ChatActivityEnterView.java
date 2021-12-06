@@ -3112,7 +3112,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                     sendPopupWindow.dismiss();
                 }
             });
-            sendPopupLayout.setShownFromBotton(false);
+            sendPopupLayout.setShownFromBottom(false);
 
             for (int a = 0; a < 2; a++) {
                 if (a == 0 && !parentFragment.canScheduleMessage() || a == 1 && (UserObject.isUserSelf(user) || slowModeTimer > 0 && !isInScheduleMode())) {

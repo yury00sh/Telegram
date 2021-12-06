@@ -367,7 +367,7 @@ public class ActionBarMenuItem extends FrameLayout {
         if (popupLayout == null) {
             return;
         }
-        popupLayout.setShownFromBotton(value);
+        popupLayout.setShownFromBottom(value);
     }
 
     public void addSubItem(View view, int width, int height) {

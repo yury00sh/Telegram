@@ -1252,7 +1252,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
                     popupWindow.dismiss();
                 }
             });
-            popupLayout.setShownFromBotton(false);
+            popupLayout.setShownFromBottom(false);
 
             deleteView = new TextView(parentActivity);
             deleteView.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector), 2));

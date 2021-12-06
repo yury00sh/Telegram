@@ -537,6 +537,11 @@ public class AndroidUtilities {
         return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId) : 0;
     }
 
+    public static int getNavigationBarHeight(Context context) {
+        int resourceId = context.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        return resourceId > 0 ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+    }
+
     public static int getThumbForNameOrMime(String name, String mime, boolean media) {
         if (name != null && name.length() != 0) {
             int color = -1;

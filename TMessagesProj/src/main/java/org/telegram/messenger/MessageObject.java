@@ -67,10 +67,17 @@ public class MessageObject {
     public static final int MESSAGE_SEND_STATE_EDITING = 3;
 
     public static final int TYPE_PHOTO = 1;
+    public static final int TYPE_VOICE = 2;
     public static final int TYPE_VIDEO = 3;
+    public static final int TYPE_GEO = 4;
     public static final int TYPE_ROUND_VIDEO = 5;
+    public static final int TYPE_GIF = 8;
+    public static final int TYPE_DOCUMENT = 9;
+    public static final int TYPE_CONTACT = 12;
     public static final int TYPE_STICKER = 13;
+    public static final int TYPE_MUSIC = 14;
     public static final int TYPE_ANIMATED_STICKER = 15;
+    public static final int TYPE_CALL = 16;
     public static final int TYPE_POLL = 17;
 
     public int localType;
@@ -113,6 +120,7 @@ public class MessageObject {
     public boolean viewsReloaded;
     public boolean pollVisibleOnScreen;
     public long pollLastCheckTime;
+    public long reactionsLastCheckTime;
     public int wantedBotKeyboardWidth;
     public boolean attachPathExists;
     public boolean mediaExists;
@@ -122,6 +130,9 @@ public class MessageObject {
     public StringBuilder botButtonsLayout;
     public boolean isRestrictedMessage;
     public long loadedFileSize;
+//    public HashMap<String, Integer> reactionCounts;
+    public ArrayList<TLRPC.TL_reactionCount> reactionCounts;
+    public String chosenReaction;
 
     public byte[] sponsoredId;
     public int sponsoredChannelPost;
@@ -432,6 +443,10 @@ public class MessageObject {
                 sum += array[a];
             }
             return maxSizeWidth / sum;
+        }
+
+        public boolean hasReactions() {
+            return messages.get(0).hasReactions();
         }
 
         public void calculate() {
@@ -924,6 +939,11 @@ public class MessageObject {
         TLRPC.User fromUser = null;
         if (message.from_id instanceof TLRPC.TL_peerUser) {
             fromUser = getUser(users, sUsers, message.from_id.user_id);
+        }
+
+        if (message.reactions != null) {
+            ArrayList<TLRPC.TL_reactionCount> count = message.reactions.results;
+            reactionCounts = count;
         }
 
         updateMessageText(users, chats, sUsers, sChats);

@@ -74,7 +74,6 @@ import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.DividerCell;
@@ -1071,7 +1070,7 @@ public class PhotoPickerActivity extends BaseFragment implements NotificationCen
                             sendPopupWindow.dismiss();
                         }
                     });
-                    sendPopupLayout.setShownFromBotton(false);
+                    sendPopupLayout.setShownFromBottom(false);
 
                     itemCells = new ActionBarMenuSubItem[2];
                     for (int a = 0; a < 2; a++) {

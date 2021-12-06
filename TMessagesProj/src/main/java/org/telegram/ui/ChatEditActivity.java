@@ -181,6 +181,7 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
             imageUpdater.openPhotoForEdit(file, thumb, 0, isVideo);
         }
     };
+    private TextCell reactionsCell;
 
     public ChatEditActivity(Bundle args) {
         super(args);
@@ -810,6 +811,15 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
             presentFragment(fragment);
         });
 
+        reactionsCell = new TextCell(context);
+        reactionsCell.setBackgroundDrawable(Theme.getSelectorDrawable(false));
+        reactionsCell.setOnClickListener(v -> {
+            Bundle args = new Bundle();
+            ChatEditReactionsActivity fragment = new ChatEditReactionsActivity(chatId);
+            fragment.setInfo(info);
+            presentFragment(fragment);
+        });
+
         adminCell = new TextCell(context);
         adminCell.setBackgroundDrawable(Theme.getSelectorDrawable(false));
         adminCell.setOnClickListener(v -> {
@@ -853,6 +863,9 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
         }
         if (!isChannel) {
             infoContainer.addView(inviteLinksCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        }
+        if (currentChat.admin_rights == null || currentChat.admin_rights.change_info) {
+            infoContainer.addView(reactionsCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         }
         infoContainer.addView(adminCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         infoContainer.addView(membersCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
@@ -1423,6 +1436,23 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                     }
                     if (memberRequestsCell != null) {
                         memberRequestsCell.setTextAndValueAndIcon(LocaleController.getString("MemberRequests", R.string.MemberRequests), String.format("%d", info.requests_pending), R.drawable.actions_requests, logCell != null && logCell.getVisibility() == View.VISIBLE);
+                    }
+                }
+                if (reactionsCell != null) {
+                    if (info != null) {
+                        String reactionsValue;
+                        if (info.available_reactions == null || info.available_reactions.isEmpty()) {
+                            reactionsValue = "Off";
+                        } else {
+                            int reactionsEnabled = info.available_reactions.size();
+                            int total = 11;
+                            if (getMessagesController().getAvailableReactions() != null) {
+                                total = getMessagesController().getAvailableReactions().size();
+                            }
+                            total = Math.max(total,  reactionsEnabled); // T-T
+                            reactionsValue = String.format("%d/%d", reactionsEnabled, total);
+                        }
+                        reactionsCell.setTextAndValueAndIcon("Reactions", reactionsValue, R.drawable.actions_reactions, true);
                     }
                 }
                 adminCell.setTextAndValueAndIcon(LocaleController.getString("ChannelAdministrators", R.string.ChannelAdministrators), String.format("%d", ChatObject.isChannel(currentChat) ? info.admins_count : getAdminCount()), R.drawable.actions_addadmin, true);

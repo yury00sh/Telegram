@@ -11,6 +11,7 @@ import android.util.Property;
 import android.view.View;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LocaleController;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -24,6 +25,8 @@ public class AnimatedNumberLayout {
     private float progress = 0.0f;
     private int currentNumber = 1;
     private final View parentView;
+    private boolean formatShort;
+    private boolean invertDirection;
 
     public static final Property<AnimatedNumberLayout, Float> PROGRESS = new AnimationProperties.FloatProperty<AnimatedNumberLayout>("progress") {
         @Override
@@ -37,9 +40,11 @@ public class AnimatedNumberLayout {
         }
     };
 
-    public AnimatedNumberLayout(View parent, TextPaint paint) {
+    public AnimatedNumberLayout(View parent, TextPaint paint, boolean formatShort, boolean invertDirection) {
         textPaint = paint;
         parentView = parent;
+        this.formatShort = formatShort;
+        this.invertDirection = invertDirection;
     }
 
     private void setProgress(float value) {
@@ -74,9 +79,18 @@ public class AnimatedNumberLayout {
         oldLetters.clear();
         oldLetters.addAll(letters);
         letters.clear();
-        String oldText = String.format(Locale.US, "%d", currentNumber);
-        String text = String.format(Locale.US, "%d", number);
+        String oldText, text;
+        if (formatShort) {
+            oldText = LocaleController.formatShortNumber(currentNumber, null);
+            text = LocaleController.formatShortNumber(number, null);
+        } else {
+            oldText = String.format(Locale.US, "%d", currentNumber);
+            text = String.format(Locale.US, "%d", number);
+        }
         boolean forwardAnimation = number > currentNumber;
+        if (invertDirection) {
+            forwardAnimation = !forwardAnimation;
+        }
         currentNumber = number;
         progress = 0;
         for (int a = 0; a < text.length(); a++) {

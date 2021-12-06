@@ -1440,7 +1440,7 @@ public class PhotoPaintView extends FrameLayout implements EntityView.EntityView
                     popupWindow.dismiss();
                 }
             });
-            popupLayout.setShownFromBotton(true);
+            popupLayout.setShownFromBottom(true);
         }
 
         popupLayout.removeInnerViews();

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.os.Build;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.Interpolator;
@@ -103,7 +102,7 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1f);
         valueAnimator.addUpdateListener(animation -> {
             if (activity != null) {
-                activity.onListItemAniamtorTick();
+                activity.onListItemAnimatorTick();
             } else {
                 recyclerListView.invalidate();
             }

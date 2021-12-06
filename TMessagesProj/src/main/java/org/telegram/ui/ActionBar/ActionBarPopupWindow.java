@@ -90,7 +90,7 @@ public class ActionBarPopupWindow extends PopupWindow {
         private float backScaleY = 1;
         private int backAlpha = 255;
         private int lastStartedChild = 0;
-        private boolean shownFromBotton;
+        private boolean shownFromBottom;
         private boolean animationEnabled = allowAnimation;
         private ArrayList<AnimatorSet> itemAnimators;
         private HashMap<View, Integer> positions = new HashMap<>();
@@ -190,8 +190,8 @@ public class ActionBarPopupWindow extends PopupWindow {
             fitItems = value;
         }
 
-        public void setShownFromBotton(boolean value) {
-            shownFromBotton = value;
+        public void setShownFromBottom(boolean value) {
+            shownFromBottom = value;
         }
 
         public void setDispatchKeyEventListener(OnDispatchKeyEventListener listener) {
@@ -229,7 +229,7 @@ public class ActionBarPopupWindow extends PopupWindow {
             backScaleY = value;
             if (animationEnabled) {
                 int height = getMeasuredHeight() - AndroidUtilities.dp(16);
-                if (shownFromBotton) {
+                if (shownFromBottom) {
                     for (int a = lastStartedChild; a >= 0; a--) {
                         View child = getItemAt(a);
                         if (child.getVisibility() != VISIBLE) {
@@ -279,7 +279,7 @@ public class ActionBarPopupWindow extends PopupWindow {
                 AnimatorSet animatorSet = new AnimatorSet();
                 animatorSet.playTogether(
                         ObjectAnimator.ofFloat(child, View.ALPHA, 0f, child.isEnabled() ? 1f : 0.5f),
-                        ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, AndroidUtilities.dp(shownFromBotton ? 6 : -6), 0));
+                        ObjectAnimator.ofFloat(child, View.TRANSLATION_Y, AndroidUtilities.dp(shownFromBottom ? 6 : -6), 0));
                 animatorSet.setDuration(180);
                 animatorSet.addListener(new AnimatorListenerAdapter() {
                     @Override
@@ -305,8 +305,21 @@ public class ActionBarPopupWindow extends PopupWindow {
             linearLayout.addView(child);
         }
 
+        @Override
+        public void addView(View child, int index) {
+            linearLayout.addView(child, index);
+        }
+
         public void addView(View child, LinearLayout.LayoutParams layoutParams) {
             linearLayout.addView(child, layoutParams);
+        }
+
+        public void addView(View child, int index, LinearLayout.LayoutParams layoutParams) {
+            linearLayout.addView(child, index, layoutParams);
+        }
+
+        public LinearLayout getContentView() {
+            return linearLayout;
         }
 
         public void removeInnerViews() {
@@ -343,7 +356,7 @@ public class ActionBarPopupWindow extends PopupWindow {
                         canvas.clipRect(0, bgPaddings.top, getMeasuredWidth(), getMeasuredHeight());
                     }
                     backgroundDrawable.setAlpha(backAlpha);
-                    if (shownFromBotton) {
+                    if (shownFromBottom) {
                         final int height = getMeasuredHeight();
                         backgroundDrawable.setBounds(0, (int) (height * (1.0f - backScaleY)), (int) (getMeasuredWidth() * backScaleX), height);
                     } else {
@@ -575,7 +588,7 @@ public class ActionBarPopupWindow extends PopupWindow {
                 content.positions.put(child, visibleCount);
                 visibleCount++;
             }
-            if (content.shownFromBotton) {
+            if (content.shownFromBottom) {
                 content.lastStartedChild = count - 1;
             } else {
                 content.lastStartedChild = 0;
@@ -673,7 +686,7 @@ public class ActionBarPopupWindow extends PopupWindow {
                 windowAnimatorSet.setDuration(outEmptyTime);
             } else {
                 windowAnimatorSet.playTogether(
-                        ObjectAnimator.ofFloat(viewGroup, View.TRANSLATION_Y, AndroidUtilities.dp((content != null && content.shownFromBotton) ? 5 : -5)),
+                        ObjectAnimator.ofFloat(viewGroup, View.TRANSLATION_Y, AndroidUtilities.dp((content != null && content.shownFromBottom) ? 5 : -5)),
                         ObjectAnimator.ofFloat(viewGroup, View.ALPHA, 0.0f));
                 windowAnimatorSet.setDuration(dismissAnimationDuration);
             }

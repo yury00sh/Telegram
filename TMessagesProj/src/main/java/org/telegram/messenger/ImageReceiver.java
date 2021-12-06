@@ -2051,6 +2051,10 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
         return param;
     }
 
+    public boolean hasImageDrawable() {
+        return currentImageDrawable != null;
+    }
+
     protected boolean setImageBitmapByKey(Drawable drawable, String key, int type, boolean memCache, int guid) {
         if (drawable == null || key == null || currentGuid != guid) {
             return false;

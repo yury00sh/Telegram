@@ -455,7 +455,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                             }
                             return false;
                         });
-                        popupLayout.setShownFromBotton(false);
+                        popupLayout.setShownFromBottom(false);
 
                         deleteView = new TextView(textSelectionOverlay.getContext());
                         deleteView.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), 2));
